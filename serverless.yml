@@ -23,3 +23,9 @@ functions:
       - httpApi:
           path: /buy
           method: GET
+  api_three:
+    handler: buy.handler
+    events:
+      - httpApi:
+          path: /buy2
+          method: GET

@@ -26,6 +26,12 @@
               "LogGroupName": "/aws/lambda/serverless-lambda-dev-api_two"
             }
           },
+          "ApiUnderscorethreeLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/serverless-lambda-dev-api_three"
+            }
+          },
           "IamRoleLambdaExecution": {
             "Type": "AWS::IAM::Role",
             "Properties": {
@@ -109,7 +115,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "serverless-framework-deployments-ap-south-1-8910130b-bf30",
-                "S3Key": "serverless/serverless-lambda/dev/1734102563980-2024-12-13T15:09:23.980Z/serverless-lambda.zip"
+                "S3Key": "serverless/serverless-lambda/dev/1734159030147-2024-12-14T06:50:30.147Z/serverless-lambda.zip"
               },
               "Handler": "helloo.handler",
               "Runtime": "nodejs20.x",
@@ -132,7 +138,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "serverless-framework-deployments-ap-south-1-8910130b-bf30",
-                "S3Key": "serverless/serverless-lambda/dev/1734102563980-2024-12-13T15:09:23.980Z/serverless-lambda.zip"
+                "S3Key": "serverless/serverless-lambda/dev/1734159030147-2024-12-14T06:50:30.147Z/serverless-lambda.zip"
               },
               "Handler": "buy.handler",
               "Runtime": "nodejs20.x",
@@ -150,24 +156,57 @@
               "ApiUnderscoretwoLogGroup"
             ]
           },
-          "ApiLambdaVersionOkEAZgSKzrzrrRFdCzElSypv3kwSPPi96xQHoi3Y": {
+          "ApiUnderscorethreeLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": "serverless-framework-deployments-ap-south-1-8910130b-bf30",
+                "S3Key": "serverless/serverless-lambda/dev/1734159030147-2024-12-14T06:50:30.147Z/serverless-lambda.zip"
+              },
+              "Handler": "buy.handler",
+              "Runtime": "nodejs20.x",
+              "FunctionName": "serverless-lambda-dev-api_three",
+              "MemorySize": 1024,
+              "Timeout": 6,
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "ApiUnderscorethreeLogGroup"
+            ]
+          },
+          "ApiLambdaVersion71LtuZ6DFDNZfqVno8ye1BDW3N6ouYST3jxB6YLf72E": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "ApiLambdaFunction"
               },
-              "CodeSha256": "m1xsUfWZ+cyOHj/eMlJWqXxNzGWxxPE58Nc8y9ZvD7o="
+              "CodeSha256": "kLoYtwM1/ArVUg5ce6kUCeCX3bHrdvaq9C6t8iGRYVE="
             }
           },
-          "ApiUnderscoretwoLambdaVersionMm7DsP9FKL74142EXdfiZX1aNphXgqsmKYrHIBb2cAo": {
+          "ApiUnderscoretwoLambdaVersionmr6Z3icNvrsJon2M7vLtQECUa3sITkZf62Pxq0cJCA": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "ApiUnderscoretwoLambdaFunction"
               },
-              "CodeSha256": "m1xsUfWZ+cyOHj/eMlJWqXxNzGWxxPE58Nc8y9ZvD7o="
+              "CodeSha256": "kLoYtwM1/ArVUg5ce6kUCeCX3bHrdvaq9C6t8iGRYVE="
+            }
+          },
+          "ApiUnderscorethreeLambdaVersion96OwOpfN63Yy7xOh9LzwCzXXgRjrkekGuSAqq7FeqE": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "ApiUnderscorethreeLambdaFunction"
+              },
+              "CodeSha256": "kLoYtwM1/ArVUg5ce6kUCeCX3bHrdvaq9C6t8iGRYVE="
             }
           },
           "HttpApi": {
@@ -333,6 +372,78 @@
               }
             },
             "DependsOn": "HttpApiIntegrationApiUnderscoretwo"
+          },
+          "ApiUnderscorethreeLambdaPermissionHttpApi": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "ApiUnderscorethreeLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "HttpApi"
+                    },
+                    "/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "HttpApiIntegrationApiUnderscorethree": {
+            "Type": "AWS::ApiGatewayV2::Integration",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "IntegrationType": "AWS_PROXY",
+              "IntegrationUri": {
+                "$ref": "$[\"service\"][\"provider\"][\"compiledCloudFormationTemplate\"][\"Resources\"][\"ApiUnderscorethreeLambdaPermissionHttpApi\"][\"Properties\"][\"FunctionName\"]"
+              },
+              "PayloadFormatVersion": "2.0",
+              "TimeoutInMillis": 30000
+            }
+          },
+          "HttpApiRouteGetBuy2": {
+            "Type": "AWS::ApiGatewayV2::Route",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "RouteKey": "GET /buy2",
+              "Target": {
+                "Fn::Join": [
+                  "/",
+                  [
+                    "integrations",
+                    {
+                      "Ref": "HttpApiIntegrationApiUnderscorethree"
+                    }
+                  ]
+                ]
+              }
+            },
+            "DependsOn": "HttpApiIntegrationApiUnderscorethree"
           }
         },
         "Outputs": {
@@ -345,7 +456,7 @@
           "ApiLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "ApiLambdaVersionOkEAZgSKzrzrrRFdCzElSypv3kwSPPi96xQHoi3Y"
+              "Ref": "ApiLambdaVersion71LtuZ6DFDNZfqVno8ye1BDW3N6ouYST3jxB6YLf72E"
             },
             "Export": {
               "Name": "sls-serverless-lambda-dev-ApiLambdaFunctionQualifiedArn"
@@ -354,10 +465,19 @@
           "ApiUnderscoretwoLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "ApiUnderscoretwoLambdaVersionMm7DsP9FKL74142EXdfiZX1aNphXgqsmKYrHIBb2cAo"
+              "Ref": "ApiUnderscoretwoLambdaVersionmr6Z3icNvrsJon2M7vLtQECUa3sITkZf62Pxq0cJCA"
             },
             "Export": {
               "Name": "sls-serverless-lambda-dev-ApiUnderscoretwoLambdaFunctionQualifiedArn"
+            }
+          },
+          "ApiUnderscorethreeLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "ApiUnderscorethreeLambdaVersion96OwOpfN63Yy7xOh9LzwCzXXgRjrkekGuSAqq7FeqE"
+            },
+            "Export": {
+              "Name": "sls-serverless-lambda-dev-ApiUnderscorethreeLambdaFunctionQualifiedArn"
             }
           },
           "HttpApiId": {
@@ -418,7 +538,7 @@
         "timeout": 6,
         "runtime": "nodejs20.x",
         "vpc": {},
-        "versionLogicalId": "ApiLambdaVersionOkEAZgSKzrzrrRFdCzElSypv3kwSPPi96xQHoi3Y"
+        "versionLogicalId": "ApiLambdaVersion71LtuZ6DFDNZfqVno8ye1BDW3N6ouYST3jxB6YLf72E"
       },
       "api_two": {
         "handler": "buy.handler",
@@ -438,7 +558,27 @@
         "timeout": 6,
         "runtime": "nodejs20.x",
         "vpc": {},
-        "versionLogicalId": "ApiUnderscoretwoLambdaVersionMm7DsP9FKL74142EXdfiZX1aNphXgqsmKYrHIBb2cAo"
+        "versionLogicalId": "ApiUnderscoretwoLambdaVersionmr6Z3icNvrsJon2M7vLtQECUa3sITkZf62Pxq0cJCA"
+      },
+      "api_three": {
+        "handler": "buy.handler",
+        "events": [
+          {
+            "httpApi": {
+              "path": "/buy2",
+              "method": "GET"
+            },
+            "resolvedMethod": "GET",
+            "resolvedPath": "/buy2"
+          }
+        ],
+        "name": "serverless-lambda-dev-api_three",
+        "package": {},
+        "memory": 1024,
+        "timeout": 6,
+        "runtime": "nodejs20.x",
+        "vpc": {},
+        "versionLogicalId": "ApiUnderscorethreeLambdaVersion96OwOpfN63Yy7xOh9LzwCzXXgRjrkekGuSAqq7FeqE"
       }
     },
     "configValidationMode": "warn",
@@ -462,7 +602,7 @@
     "artifact": "/Users/hirakroy/Documents/GitHub/serverless-lambda/.serverless/serverless-lambda.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/serverless-lambda/dev/1734102563980-2024-12-13T15:09:23.980Z",
+    "artifactDirectoryName": "serverless/serverless-lambda/dev/1734159030147-2024-12-14T06:50:30.147Z",
     "artifact": "serverless-lambda.zip"
   }
 }
